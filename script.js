@@ -31,9 +31,6 @@ function create() {
         console.log('Ball clicked!');
         yspeed *= 1.05
         xspeed *= 1.05
-        ball.setDisplaySize (ballSIZE, ballSIZE);
-        Lives += 1
-        liveText.setText (`Lives = ${Lives}`)
     })
 }
 
