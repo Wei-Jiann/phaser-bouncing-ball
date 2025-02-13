@@ -1,5 +1,5 @@
-let WIDTH = 400;
-let HEIGHT = 300;
+let WIDTH = 800;
+let HEIGHT = 600;
 
 const config = {
     type: Phaser.AUTO,
@@ -26,6 +26,15 @@ function preload() {
 function create() {
     ball = this.add.sprite(WIDTH / 2, HEIGHT / 2, "ball"); // x, y, and the ball "key"
     ball.setDisplaySize(ballSize, ballSize); // width, height
+    ball.setInteractive ()
+    ball.on('pointerdown', function(){
+        console.log('Ball clicked!');
+        yspeed *= 1.05
+        xspeed *= 1.05
+        ball.setDisplaySize (ballSIZE, ballSIZE);
+        Lives += 1
+        liveText.setText (`Lives = ${Lives}`)
+    })
 }
 
 function update() {
