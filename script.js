@@ -1,10 +1,9 @@
-let WIDTH = 800;
-let HEIGHT = 600;
-
+let WIDTH = 800
+let HEIGHT = 600
 const config = {
     type: Phaser.AUTO,
-    width: WIDTH,
-    height: HEIGHT,
+    width: 800,
+    height: 600,
     scene: {
         preload: preload,
         create: create,
@@ -15,36 +14,71 @@ const config = {
 const game = new Phaser.Game(config);
 
 let ball;
-let ballSize = 80;
-let yspeed = 0.5;
-let xspeed = 1.0;
+let yspeed = 1;
+let xspeed = 1;
+let ballSIZE = 80
+let Lives = 10
+let liveText; 
+let disapointment;
 
 function preload() {
-    this.load.image("ball", "assets/ball.png"); // watch out for case sensitivity
+    // Load assets here
+    this.load.image("ball", "Assets/ball.png");
 }
 
 function create() {
-    ball = this.add.sprite(WIDTH / 2, HEIGHT / 2, "ball"); // x, y, and the ball "key"
-    ball.setDisplaySize(ballSize, ballSize); // width, height
+    // Initializing Game Objects here!
+    ball = this.add.sprite (WIDTH/2, HEIGHT/2, "ball");
+    ball.setDisplaySize (ballSIZE,ballSIZE) 
+
     ball.setInteractive ()
     ball.on('pointerdown', function(){
         console.log('Ball clicked!');
         yspeed *= 1.05
         xspeed *= 1.05
+        ball.setDisplaySize (ballSIZE, ballSIZE);
+        Lives += 1
+        liveText.setText (`Lives = ${Lives}`)
     })
+    liveText = this.add.text(600,500,`Lives : ${Lives}`, {
+        fontSize: '24px',
+        fill: '#808080'
+    })
+    disapointment = this.add.text (WIDTH/2, HEIGHT/2, 'GAME OVER!', {
+        fontSize: '64px',
+        fill: '#ff0000'
+    })
+    disapointment.setOrigin(0.5);
+    disapointment.setVisible(false);
 }
 
 function update() {
+    if (Lives <= 0) {
+        return;
+    }
+
+    // Game logic here
+    let borderY = HEIGHT - ballSIZE/2
+    let borderX = WIDTH - ballSIZE/2
+    if (ball.y >= borderY || ball.y <= ballSIZE/2) {
+        yspeed *= -1;
+        Lives -= 1
+        liveText.setText (`Lives = ${Lives}`);
+        checkGameOver();
+    } 
+    if (ball.x >= borderX || ball.x <= ballSIZE/2){
+        xspeed *= -1;
+        Lives -= 1
+        liveText.setText (`Lives = ${Lives}`);
+        checkGameOver();
+    }
     ball.y += yspeed;
     ball.x += xspeed;
-
-    // The || sign means "or"
-    if (ball.y >= HEIGHT - ballSize / 2 || ball.y <= ballSize / 2) {
-        // Multiplying by -1 will "flip" the direction
-        yspeed *= -1;
-    }
-
-    if (ball.x >= WIDTH - ballSize / 2 || ball.x <= ballSize / 2) {
-        xspeed *= -1;
-    }
+    function checkGameOver () {
+        if (Lives <= 0) {
+        Lives = 0;
+        liveText.setText (`Lives = 0`);
+        disapointment.setVisible(true);
+        ball.setVisible(false);
+    }}
 }
