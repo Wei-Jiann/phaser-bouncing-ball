@@ -33,39 +33,40 @@ function create() {
     for (let i = 0; i < numBalls ; i++) {
         let x = Phaser.Math.Between(ballSIZE, WIDTH - ballSIZE);
         let y = Phaser.Math.Between(ballSIZE, HEIGHT - ballSIZE);
-        let ball = this.add.sprite (x,y,"ball");
-        ball.setDisplaySize (ballSIZE,ballSIZE)
+        let ball = this.add.sprite(x, y, "ball");
+        ball.setDisplaySize(ballSIZE, ballSIZE);
 
-        let xspeed = Phaser.Math.floatBetween(-1,2) * (Math.random() < 0.5 ? -1 : 1);
-        let yspeed = Phaser.Math.floatBetween(-1,2) * (Math.random() < 0.5 ? -1 : 1);
+        let xspeed = Phaser.Math.FloatBetween(-1, 2) * (Math.random() < 0.5 ? -1 : 1);
+        let yspeed = Phaser.Math.FloatBetween(-1, 2) * (Math.random() < 0.5 ? -1 : 1);
 
         balls.push(ball);
-        speeds.push([xspeed,yspeed]);
+        speeds.push([xspeed, yspeed]);
+
+        ball.setInteractive();
+        ball.on('pointerdown', function() {
+            console.log('Ball clicked!');
+            speeds[i][1] *= 1.05;
+            speeds[i][0] *= 1.09;
+            Lives += 1;
+            liveText.setText(`Lives = ${Lives}`);
+            checkGameWin();
+        });
     }
-    
-    balls.setInteractive ()
-    balls.on('pointerdown', function(){
-        console.log('Ball clicked!');
-        yspeed *= 1.05
-        xspeed *= 1.09
-        Lives += 1
-        liveText.setText (`Lives = ${Lives}`)
-        checkGameWin();
-    })
-    liveText = this.add.text(600,500,`Lives : ${Lives}`, {
+
+    liveText = this.add.text(600, 500, `Lives : ${Lives}`, {
         fontSize: '24px',
         fill: '#808080'
-    })
-    disapointment = this.add.text (WIDTH/2, HEIGHT/2, 'GAME OVER!', {
+    });
+    disapointment = this.add.text(WIDTH / 2, HEIGHT / 2, 'GAME OVER!', {
         fontSize: '64px',
         fill: '#ff0000'
-    })
+    });
     disapointment.setOrigin(0.5);
     disapointment.setVisible(false);
-    success = this.add.text (WIDTH/2, HEIGHT/2, 'YOU WIN!', {
-        dontSize: '64px',
+    success = this.add.text(WIDTH / 2, HEIGHT / 2, 'YOU WIN!', {
+        fontSize: '64px',
         fill: '#00ff00'
-    })
+    });
     success.setOrigin(0.5);
     success.setVisible(false);
 }
@@ -76,27 +77,11 @@ function update() {
         return;
     }
 
-    for (let i = 0; i < numBalls; i++) {
-        moveBall(balls[i], speeds[i]);
+    for (let i = 0; i < balls.length; i++) {
+        moveBall(balls[i], i);
     }
-
-    let borderY = HEIGHT - ballSIZE/2
-    let borderX = WIDTH - ballSIZE/2
-    if (ball.y >= borderY || ball.y <= ballSIZE/2) {
-        yspeed *= -1;
-        Lives -= 1
-        liveText.setText (`Lives = ${Lives}`);
-        checkGameOver();
-    } 
-    if (ball.x >= borderX || ball.x <= ballSIZE/2){
-        xspeed *= -1;
-        Lives -= 1
-        liveText.setText (`Lives = ${Lives}`);
-        checkGameOver();
-    }
-    ball.y += yspeed;
-    ball.x += xspeed;
 }
+
 function checkGameOver () {
     if (Lives <= 0) {
         Lives = 0;
@@ -111,5 +96,21 @@ function checkGameWin () {
         liveText.setText (`Lives = 35`);
         success.setVisible(true);
         ball.setVisible(false);
+    }
+}
+function moveBall(ball, index) {
+    ball.y += speeds[index][1]; // Update y position with yspeed
+    ball.x += speeds[index][0]; // Update x position with xspeed
+    if (ball.y >= HEIGHT - ballSIZE/2 || ball.y <= ballSIZE/2) {
+        speeds[index][1] *= -1; // Reverse yspeed
+        Lives -= 1;
+        liveText.setText(`Lives = ${Lives}`);
+        checkGameOver();
+    }
+    if (ball.x >= WIDTH - ballSIZE/2 || ball.x <= ballSIZE/2) {
+        speeds[index][0] *= -1; // Reverse xspeed
+        Lives -= 1;
+        liveText.setText(`Lives = ${Lives}`);
+        checkGameOver();
     }
 }
